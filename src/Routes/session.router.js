@@ -4,33 +4,13 @@ import jwt from 'jsonwebtoken';
 import User from "../Models/user.model.js";
 import mongoose from 'mongoose';
 import { authMiddleware, handleSendErrs } from '../middlewares/auth.middleware.js';
+import { register, login } from '../Controllers/session.controller.js';
 
 const router = Router();
 
-router.post("/register",  handleSendErrs('register', 401), (req, res) => {
-    try{
-    console.log("User registered");
-    res.send({status: 'success', payload: req.user});} catch (error) {
-        console.log(error);
-        res.status(500).send({status: 'error', error: 'Error al registrar el usuario'});
-    }
-});
+router.post("/register",  handleSendErrs('register', 401), register);
 
-router.post('/login',  handleSendErrs('login', 401), (req, res) => {
-    try{
-        const token = jwt.sign({ _id: req.user._id, role: req.user.role}, process.env.JWT_SECRET, { expiresIn: "1d" });
-                    res.cookie("ssid", token, {
-                        httpOnly: true,
-                        secure: true,
-                        sameSite: "Lax", 
-                        maxAge:  1 * 24 * 60 * 60 * 1000
-                });
-    console.log("User logged in");
-    res.send({status: 'success', payload: req.user});} catch (error) {
-        console.log(error);
-        res.status(500).send({status: 'error', error: 'Error al iniciar sesion'});
-    }
-});
+router.post('/login',  handleSendErrs('login', 401), login);
 
 router.get('/current', authMiddleware, async (req, res) => {
     try{

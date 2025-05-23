@@ -1,4 +1,5 @@
 import passport from 'passport';
+
 import jwt from 'jsonwebtoken';
 
 export const authMiddleware = (req, res, next) => {
@@ -6,15 +7,38 @@ export const authMiddleware = (req, res, next) => {
     if (!token) {
         return res.status(401).send({ status: 'error', error: 'No autorizado' });
     }
-    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-        if (err) {
-            return res.status(403).send({ status: 'error', error: 'Token inválido' });
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if(!decoded) {
+            return res.status(403).send({ status: 'error', error: 'Ha ocurrido un error, vuelve a iniciar sesión' });
         }
-        
+        const userExist = passport.deserializeUser(decoded._id);
+        if(!userExist){
+            return res.status(403).send({ status: 'error', error: 'No tienes permisos para acceder a esta ruta' });
+        }
         req.user = decoded;
         next();
-    });
-};
+    };
+;
+export const authMiddlewareAdmin = (req, res, next) => {
+    const token = req.cookies.ssid;
+    if (!token) {
+        return res.status(401).send({ status: 'error', error: 'No autorizado' });
+    }
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if(!decoded) {
+            return res.status(403).send({ status: 'error', error: 'Ha ocurrido un error, vuelve a iniciar sesión' });
+        }
+        const userExist = passport.deserializeUser(decoded._id);
+        if(!userExist){
+            return res.status(403).send({ status: 'error', error: 'No tienes permisos para acceder a esta ruta' });
+        }
+        if (decoded.role !== 'admin') {
+          return res.status(403).send({ status: 'error', error: 'No tienes permisos para acceder a esta ruta' });
+        }
+        req.user = decoded;
+        next();
+    };
+;
 export const handleSendErrs = (strategy, errorStatus = 401) => {
     return (req, res, next) => {
       passport.authenticate(

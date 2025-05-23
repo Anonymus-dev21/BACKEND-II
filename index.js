@@ -6,7 +6,8 @@ import conectarDB from './src/config/MongoConecction.js';
 import initializePassport from './src/config/passportConfig.js';
 import sessionRouter from './src/Routes/session.router.js';
 import session from 'express-session';
-import userRouter from './src/Routes/user.router.js';
+import carritoRouter from './src/Routes/carrito.router.js'
+import productosRouter from './src/Routes/productos.router.js'
 import passport from 'passport';
 const app = express();
 
@@ -30,6 +31,8 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/sessions', sessionRouter);
+app.use('/api/carrito', carritoRouter);
+app.use('/api/productos', productosRouter);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
