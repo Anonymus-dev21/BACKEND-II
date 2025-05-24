@@ -3,8 +3,10 @@ import { isValidObjectId } from "mongoose";
 import Carrito from "../Models/cart.model.js"
 
 
+
 export const getProducts = async (req, res) => {
   try {
+    
     const { limit, page, sort, query } = req.query;
     let filter = {};
     if(query){

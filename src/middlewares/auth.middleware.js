@@ -1,5 +1,5 @@
 import passport from 'passport';
-
+import User from '../Models/user.model.js';
 import jwt from 'jsonwebtoken';
 
 export const authMiddleware = (req, res, next) => {
@@ -11,7 +11,7 @@ export const authMiddleware = (req, res, next) => {
         if(!decoded) {
             return res.status(403).send({ status: 'error', error: 'Ha ocurrido un error, vuelve a iniciar sesión' });
         }
-        const userExist = passport.deserializeUser(decoded._id);
+        const userExist = User.findById({_id: decoded._id}, {email: 1, role: 1, _id: 1, first_name: 1, last_name: 1});
         if(!userExist){
             return res.status(403).send({ status: 'error', error: 'No tienes permisos para acceder a esta ruta' });
         }
@@ -28,7 +28,7 @@ export const authMiddlewareAdmin = (req, res, next) => {
         if(!decoded) {
             return res.status(403).send({ status: 'error', error: 'Ha ocurrido un error, vuelve a iniciar sesión' });
         }
-        const userExist = passport.deserializeUser(decoded._id);
+        const userExist = User.findById({_id: decoded._id}, {email: 1, role: 1, _id: 1, first_name: 1, last_name: 1});
         if(!userExist){
             return res.status(403).send({ status: 'error', error: 'No tienes permisos para acceder a esta ruta' });
         }
